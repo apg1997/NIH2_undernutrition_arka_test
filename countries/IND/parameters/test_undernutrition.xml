@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TB.Vx.model.inputfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../TB-Vx-schema-core-Z.xsd">
+    <simulation from.year="1900" thru.year="2050">
+        <options>
+            <numerical.integration />
+        </options>
+        <demography country.code="ignore" rescale.population="1950">
+            <from.data>
+                <population file ="data/demographics.csv" />
+                <birthrate from.population.data="true" />
+                <mortality file="data/deathrates.csv"/>
+            </from.data>
+        </demography>
+        <contact.matrix file="data/all_contacts_2021.txt"/>
+    </simulation>
+    <output>
+        <detailed.output years="seq(2000,2050,1)" age.group.lower.limits="c(0,15,40)">
+            <flows dim="TB" incidence="true" transmission="true" progression="true" treatment="true"/>
+            <flows dim="HIV" incidence="true" transmission="false" progression="true" treatment="true"/>
+            <flows dim="VXa" incidence="true" transmission="false" progression="true" treatment="false"/>
+            <flows dim="RISK"/>
+        </detailed.output>
+    </output>
+    <ages lower.limits="0,15"/>
+    <VXa>
+        <VXa.stages>
+            <stage name="never" fraction.at.birth="1"/>
+            <stage name="vac1" />
+            <stage name="prev1" />
+            <stage name="vax_count" />
+        </VXa.stages>
+    </VXa>
+    <SES>
+        <SES.stages> <stage name="NA"/> </SES.stages> 
+    </SES>
+
+    <RISK>
+        <RISK.stages>
+            <stage name="NA"/>
+        </RISK.stages>
+    </RISK>
+    <HIV>
+        <HIV.stages>
+            <stage name="NA" />
+        </HIV.stages>
+    </HIV>
+    <TB>
+        <TB.stages>
+            <stage name="S" fraction.at.birth="1" />
+            <stage name="C" />
+            <stage name="I" />
+            <stage name="Dm" />      <stage name="Ds"/>
+            <stage name="Dc"/>
+            <stage name="Rt"/>
+            <stage name="R"/>
+            <stage name="TBdead"/>
+            <stage name="Dccount"/>
+            <stage name="Dscount"/>
+            <stage name="Dmcount"/>      
+        </TB.stages>
+        <seeded.infections name="multiplier" value="1.0">
+            <seeded.infection fraction="0.2460"  age.from="0" age.thru="99" stage="C"/>
+            <seeded.infection fraction="0.0188"  age.from="0" age.thru="99" stage="I"/>
+            <seeded.infection fraction="0.1980"  age.from="0" age.thru="99" stage="Dm"/>
+            <seeded.infection fraction="0.00317" age.from="0" age.thru="99" stage="Ds"/>
+            <seeded.infection fraction="0.00265" age.from="0" age.thru="99" stage="Dc"/>
+            <seeded.infection fraction="0.0484"  age.from="0" age.thru="99" stage="R"/>
+          </seeded.infections>    
+        <TB.progression>
+            <TB.parameter name="infclr"  value="0.005"/>
+            <TB.parameter name="infmin"  value="0.135"/>
+            <TB.parameter name="infsub"  value="0.1"/>
+            <TB.parameter name="minrec"  value="0.185"/>
+            <TB.parameter name="minsub"  value="0.245"/>
+            <TB.parameter name="submin"  value="1.635"/>
+            <TB.parameter name="subclin" value="0.75"/>
+            <TB.parameter name="clinsub" value="0.59"/>
+            <TB.parameter name="relmin"  value="0.005"/>
+            <TB.parameter name="relsub"  value="0.005"/>
+            <TB.parameter name="muTB"    value="0.33"/>
+            <transition.matrix>
+                <transition from="I"  to="C"       rate="infclr"/>
+                <transition from="I"  to="Dm"      rate="infmin"/>
+                <transition from="I"  to="Ds"      rate="infsub"/>
+                <transition from="Dm" to="R"       rate="minrec"/>
+                <transition from="Dm" to="Ds"      rate="minsub"/>
+                <transition from="Ds" to="Dm"      rate="submin"/>
+                <transition from="Ds" to="Dc"      rate="subclin"/>
+                <transition from="Dc" to="Ds"      rate="clinsub"/>
+                <transition from="Rt" to="Dm"      rate="relmin"/>
+                <transition from="Rt" to="Ds"      rate="relsub"/>
+                <transition from="Dc" to="TBdead"  rate="muTB"/>
+                <transition from="I"  to="Dmcount" rate="infmin"/>
+                <transition from="I"  to="Dscount" rate="infsub"/>
+                <transition from="Dm" to="Dscount" rate="minsub"/>
+                <transition from="Ds" to="Dmcount" rate="submin"/>
+                <transition from="Ds" to="Dccount" rate="subclin"/>
+                <transition from="Dc" to="Dscount" rate="clinsub"/>
+                <transition from="Rt" to="Dmcount" rate="relmin"/>
+                <transition from="Rt" to="Dscount" rate="relsub"/>
+            </transition.matrix>
+        </TB.progression>
+        <TB.infectivity>
+            <TB.parameter name="t" value="0.81" />
+            <infectivity.matrix>
+                <infectivity stage="Ds" value="t"/>
+                <infectivity stage="Dc" value="1"/>
+            </infectivity.matrix>
+        </TB.infectivity>
+        <TB.transmission>
+            <TB.parameter name="lambda" value="0.0034"/>
+            <TB.parameter name="p" value="0.78"/>
+            <TB.parameter name="r" value="3.205"/>
+            <transition.matrix>
+              <transition from="S"  to="I" rate="lambda"/>
+              <transition from="C"  to="I" rate="lambda"/>
+              <transition from="R"  to="I" rate="lambda*p"/>
+              <transition from="Rt" to="I" rate="lambda*r"/>
+            </transition.matrix>
+            <contact.rate.multiplier name="beta" times="1800,2020" values="1,1"/>                 
+        </TB.transmission>
+    </TB>
+</TB.Vx.model.inputfile>
