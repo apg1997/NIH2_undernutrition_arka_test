@@ -1,0 +1,5 @@
+DEBUG [2024-03-07 14:39:25] successful result of read.model()
+DEBUG [2024-03-07 14:39:25] successful result of init.var.parameters.and.matrices()
+WARN  [2024-03-07 14:39:39]  ntimesteps = 46137 in 13.9s elapsed (5.860s cpu) which may be excessive ; please reconsider parameter values
+DEBUG [2024-03-07 14:39:39] successful result of run.deSolve()
+DEBUG [2024-03-07 14:39:40] successful generation of stocks output from generate.prevalence.output()

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TB.Vx.model.inputfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../TB-Vx-schema-core-Z.xsd">
-    <simulation from.year="1900" thru.year="2050">
+    <simulation from.year="1920" thru.year="2050">
         <options>
-            <numerical.integration />
+      <numerical.integration method="ode45" atol="0" rtol="1e-7" min.value.for.state.var="-0.1"/>
         </options>
         <demography country.code="ignore" rescale.population="1950">
             <from.data>
@@ -15,30 +15,30 @@
     </simulation>
     <output>
         <detailed.output years="seq(2000,2050,1)" age.group.lower.limits="c(0,15,40)">
-            <flows dim="TB" incidence="true" transmission="true" progression="true" treatment="true"/>
-            <flows dim="HIV" incidence="true" transmission="false" progression="true" treatment="true"/>
-            <flows dim="VXa" incidence="true" transmission="false" progression="true" treatment="false"/>
-            <flows dim="RISK"/>
+      <flows dim="TB" incidence="true" transmission="true" progression="true" treatment="true"/>
+      <flows dim="HIV" incidence="false" transmission="false" progression="false" treatment="false"/>
+      <flows dim="VXa" incidence="false" transmission="false" progression="false" treatment="false"/>
+      <flows dim="RISK" incidence="true" transmission="false" progression="false" treatment="false"/>
         </detailed.output>
     </output>
     <ages lower.limits="0,15"/>
     <VXa>
         <VXa.stages>
-            <stage name="never" fraction.at.birth="1"/>
-            <stage name="vac1" />
-            <stage name="prev1" />
-            <stage name="vax_count" />
+            <stage name="NA"/>
         </VXa.stages>
     </VXa>
     <SES>
         <SES.stages> <stage name="NA"/> </SES.stages> 
     </SES>
 
-    <RISK>
-        <RISK.stages>
-            <stage name="NA"/>
-        </RISK.stages>
-    </RISK>
+<RISK>
+    <RISK.stages>
+      <stage name="over" fraction.at.birth="0.058"/>
+      <stage name="normal" fraction.at.birth="0.61"/>
+      <stage name="mild" fraction.at.birth="0.17"/>
+      <stage name="moderate" fraction.at.birth="0.162"/>
+    </RISK.stages>
+  </RISK>
     <HIV>
         <HIV.stages>
             <stage name="NA" />

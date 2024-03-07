@@ -1,22 +1,23 @@
 # # Load necessary libraries
 # library(pacman)
 # p_load("Matrix", "here", "assertthat", "xml2", "digest", "deSolve", "data.table", "fst", "minpack.lm", "lubridate", "log4r", "stringi", "tools","data.table","cowplot","patchwork","dplyr")
-# 
+#
 # # Install and load the 'tbmod' package
 # install.packages(here("tbmod-rpackage", "tbmod_3.4.8.tar.gz"), repos = NULL, type = "source")
-
 library(tbmod)
 
 # Check the version of the 'tbmod' package
 packageVersion("tbmod")
 
 # Set paths for input and output files
-paths = set.paths(countries   = "countries", 
-                  countrycode = "IND", 
-                  xml         = "test_undernutrition.xml")
+paths <- set.paths(
+  countries = "countries",
+  countrycode = "IND",
+  xml = "test_undernutrition.xml"
+)
 
 # Run the 'tbmod' model
-output = run(paths, sample.parameters = FALSE, output.flows = FALSE, write.to.file = FALSE)
+output <- run(paths, sample.parameters = FALSE, output.flows = FALSE, write.to.file = TRUE)
 
 # Extract TB trends data from the output
 TB_trends <- output$stocks
@@ -47,7 +48,7 @@ pops <- TB_trends %>%
 
 # Summarize TB prevalence values (Ds and Dc compartments) by year
 sum_tb_values <- TB_trends %>%
-  filter(TB %in% c("Ds", "Dc","Dm")) %>%
+  filter(TB %in% c("Ds", "Dc", "Dm")) %>%
   group_by(year) %>%
   summarise(prevalence_value = sum(value))
 
@@ -55,12 +56,11 @@ sum_tb_values <- TB_trends %>%
 sum_tb_values <- merge(pops, sum_tb_values, by.x = "year")
 
 # Calculate TB prevalence per 100,000 population
-sum_tb_values$prev_per_100000 <- (sum_tb_values$prevalence_value / sum_tb_values$population) * 100000
+sum_tb_values$prev_per_100000 <- (sum_tb_values$prevalence_value / sum_tb_values$population) # * 100000
 
 # Create a line plot showing TB prevalence over time
 ggplot(sum_tb_values, aes(x = year, y = prev_per_100000)) +
   geom_line(stat = "identity") +
   labs(x = "Time", y = "Prevalence per 100,000") +
   theme_minimal()
-
 
