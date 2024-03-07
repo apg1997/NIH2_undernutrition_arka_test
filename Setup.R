@@ -1,9 +1,10 @@
-# Load necessary libraries
-library(pacman)
-p_load("Matrix", "here", "assertthat", "xml2", "digest", "deSolve", "data.table", "fst", "minpack.lm", "lubridate", "log4r", "stringi", "tools","data.table","cowplot","patchwork","dplyr")
+# # Load necessary libraries
+# library(pacman)
+# p_load("Matrix", "here", "assertthat", "xml2", "digest", "deSolve", "data.table", "fst", "minpack.lm", "lubridate", "log4r", "stringi", "tools","data.table","cowplot","patchwork","dplyr")
+# 
+# # Install and load the 'tbmod' package
+# install.packages(here("tbmod-rpackage", "tbmod_3.4.8.tar.gz"), repos = NULL, type = "source")
 
-# Install and load the 'tbmod' package
-install.packages(here("tbmod-rpackage", "tbmod_3.4.8.tar.gz"), repos = NULL, type = "source")
 library(tbmod)
 
 # Check the version of the 'tbmod' package
@@ -61,3 +62,5 @@ ggplot(sum_tb_values, aes(x = year, y = prev_per_100000)) +
   geom_line(stat = "identity") +
   labs(x = "Time", y = "Prevalence per 100,000") +
   theme_minimal()
+
+
