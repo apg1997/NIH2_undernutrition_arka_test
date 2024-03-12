@@ -4,7 +4,15 @@
 #
 # # Install and load the 'tbmod' package
 # install.packages(here("tbmod-rpackage", "tbmod_3.4.8.tar.gz"), repos = NULL, type = "source")
-library(tbmod)
+library(pacman)
+p_load(tbmod)
+require(tbmod)
+library(data.table)
+library(ggplot2)
+library(cowplot)
+library(patchwork)
+library(dplyr)
+theme_set(theme_minimal_grid() + panel_border(color = "black"))
 
 # Check the version of the 'tbmod' package
 packageVersion("tbmod")
@@ -36,10 +44,13 @@ sum_by_TB <- TB_trends_filtered %>%
   summarize(total_value = sum(value))
 
 # Create a line plot showing population in each TB compartment over time
+library(ggplot2)
+
 ggplot(sum_by_TB, aes(x = year, y = total_value, color = TB)) +
   geom_line(stat = "identity") +
   labs(x = "Time", y = "Population in Compartment", color = "tbmod compartment") +
-  theme_minimal()
+  theme_minimal() +
+  scale_y_continuous(limits = c(0,max(sum_by_TB$total_value)))
 
 # Summarize TB values by year
 pops <- TB_trends %>%
@@ -58,9 +69,11 @@ sum_tb_values <- merge(pops, sum_tb_values, by.x = "year")
 # Calculate TB prevalence per 100,000 population
 sum_tb_values$prev_per_100000 <- (sum_tb_values$prevalence_value / sum_tb_values$population) # * 100000
 
+sum_tb_values$year <- as.integer(sum_tb_values$year)
 # Create a line plot showing TB prevalence over time
-ggplot(sum_tb_values, aes(x = year, y = prev_per_100000)) +
-  geom_line(stat = "identity") +
+ggplot(sum_tb_values, aes(x = year, y = prev_per_100000)) + geom_line() +
   labs(x = "Time", y = "Prevalence per 100,000") +
-  theme_minimal()
+  scale_y_continuous(limits = c(0,max(sum_tb_values$prev_per_100000)))
+  theme_minimal() +
+  scale_color_viridis_c()
 
