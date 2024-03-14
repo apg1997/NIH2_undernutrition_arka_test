@@ -8,10 +8,10 @@
             <from.data>
                 <population file ="data/demographics.csv" />
                 <birthrate from.population.data="true" />
-                <mortality file="data/IND_deathrates.csv"/>
+                <mortality file="data/deathrates.csv"/>
             </from.data>
         </demography>
-        <contact.matrix file="data/IND_all_contacts_2020.txt"/>
+        <contact.matrix file="data/all_contacts_2021.txt"/>
     </simulation>
     <output>
         <detailed.output years="seq(1900,2050,1)" age.group.lower.limits="c(0,15,40)">

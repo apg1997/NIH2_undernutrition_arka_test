@@ -21,7 +21,7 @@ packageVersion("tbmod")
 paths <- set.paths(
   countries = "countries",
   countrycode = "IND",
-  xml = "test_undernutrition.xml"
+  xml = "countries/IND/parameters/test_undernutrition_mixing_2021.xml"
 )
 
 # Run the 'tbmod' model
@@ -73,7 +73,7 @@ sum_tb_values$year <- as.integer(sum_tb_values$year)
 # Create a line plot showing TB prevalence over time
 ggplot(sum_tb_values, aes(x = year, y = prev_per_100000)) + geom_line() +
   labs(x = "Time", y = "Prevalence per 100,000") +
-  scale_y_continuous(limits = c(0,max(sum_tb_values$prev_per_100000)))
+  scale_y_continuous(limits = c(0,max(sum_tb_values$prev_per_100000)))+
   theme_minimal() +
   scale_color_viridis_c()
 
