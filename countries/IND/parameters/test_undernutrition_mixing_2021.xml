@@ -75,6 +75,12 @@
             <TB.parameter name="submin"  value="1.635"/>
             <TB.parameter name="subclin" value="0.75"/>
             <TB.parameter name="clinsub" value="0.59"/>
+            <!-- relevant parameters:
+            Diagnosis clinical TB (clinical TB to treatment): 0.889 (0.781 - 0.994)
+            Treatment failure (treatment to clinical TB): 0.087 (0.079 - 0.096)
+            Treatment completion (treatment to treated): fixed value of 1 (i.e. assumes all that don't fail treatment progress to treated).
+             -->
+            <TB.parameter name="clintreat" value="0.811657"/>
             <TB.parameter name="relmin"  value="0.005"/>
             <TB.parameter name="relsub"  value="0.005"/>
             <TB.parameter name="muTB"    value="0.33"/>
@@ -101,6 +107,7 @@
                 <transition from="Ds" to="Dm"      rate="submin"/>
                 <transition from="Ds" to="Dc"      rate="pBp*subclin"/>
                 <transition from="Dc" to="Ds"      rate="clinsub"/>
+                <transition from="Dc" to="Rt"      rate="clintreat"/>
                 <transition from="Rt" to="Dm"      rate="pBp*relmin"/>
                 <transition from="Rt" to="Ds"      rate="pBp*relsub"/>
                 <transition from="Dc" to="TBdead"  rate="pBp*muTB"/>
