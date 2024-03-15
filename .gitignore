@@ -8,3 +8,4 @@
 .quarto
 *.log
 countries/IND/output/*.txt
+Setup-viz.pdf
