@@ -77,7 +77,7 @@
             <TB.parameter name="clinsub" value="0.59"/>
             <TB.parameter name="relmin"  value="0.005"/>
             <TB.parameter name="relsub"  value="0.005"/>
-            <TB.parameter name="muTB"    value="0.73"/>
+            <TB.parameter name="muTB"    value="0.33"/>
             <TB.parameter RISK.stage="normal" name="pBp" value="1"/>
             <TB.parameter RISK.stage="over" name="pBp" value="0.26"/>
             <TB.parameter RISK.stage="mild" name="pBp" value="1.43"/>
@@ -92,16 +92,18 @@
             <TB.parameter RISK.stage="moderate" name="pBd" value="1.58"/>
             <transition.matrix>
                 <transition from="I"  to="C"       rate="infclr"/>
-                <transition from="I"  to="Dm"      rate="infmin"/>
-                <transition from="I"  to="Ds"      rate="infsub"/>
-                <transition from="Dm" to="R"       rate="pBp*minrec"/>
+                <!-- parameters below multiplied with p8p to reflect higher risk of people
+                     suffering from undernutrition to progression to more severe states of TB -->
+                <transition from="I"  to="Dm"      rate="pBp*infmin"/>
+                <transition from="I"  to="Ds"      rate="pBp*infsub"/>
+                <transition from="Dm" to="R"       rate="minrec"/>
                 <transition from="Dm" to="Ds"      rate="pBp*minsub"/>
                 <transition from="Ds" to="Dm"      rate="submin"/>
-                <transition from="Ds" to="Dc"      rate="subclin"/>
+                <transition from="Ds" to="Dc"      rate="pBp*subclin"/>
                 <transition from="Dc" to="Ds"      rate="clinsub"/>
                 <transition from="Rt" to="Dm"      rate="pBp*relmin"/>
                 <transition from="Rt" to="Ds"      rate="pBp*relsub"/>
-                <transition from="Dc" to="TBdead"  rate="muTB"/>
+                <transition from="Dc" to="TBdead"  rate="pBp*muTB"/>
                 <transition from="I"  to="Dmcount" rate="infmin"/>
                 <transition from="I"  to="Dscount" rate="infsub"/>
                 <transition from="Dm" to="Dscount" rate="pBp*minsub"/>
@@ -120,8 +122,10 @@
             </infectivity.matrix>
         </TB.infectivity>
         <TB.transmission>
-            <TB.parameter name="lambda" value="0.00345"/>
-            <TB.parameter name="p" value="0.38"/>
+            <!-- lambda changed from original value of 0.0034 -->
+            <TB.parameter name="lambda" value="0.001"/>
+            <!-- p changed from 0.78 to 0.58 to reflect increased protection from clearing infection-->  
+            <TB.parameter name="p" value="0.58"/>
             <TB.parameter name="r" value="3.205"/>
             <transition.matrix>
               <transition from="S"  to="I" rate="lambda"/>
