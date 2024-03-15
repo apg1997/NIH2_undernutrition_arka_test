@@ -76,5 +76,4 @@ ggplot(sum_tb_values, aes(x = year, y = prev_per_100000, color = RISK)) +
   geom_line() +
   labs(x = "Time", y = "Prevalence per 100,000") +
   scale_y_continuous(limits = c(0, max(sum_tb_values$prev_per_100000))) +
-  theme_gray() +
-  facet_wrap(~RISK)
+  theme_gray() 

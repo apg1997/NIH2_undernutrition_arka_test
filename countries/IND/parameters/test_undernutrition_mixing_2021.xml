@@ -78,26 +78,38 @@
             <TB.parameter name="relmin"  value="0.005"/>
             <TB.parameter name="relsub"  value="0.005"/>
             <TB.parameter name="muTB"    value="0.73"/>
+            <TB.parameter RISK.stage="normal" name="pBp" value="1"/>
+            <TB.parameter RISK.stage="over" name="pBp" value="0.26"/>
+            <TB.parameter RISK.stage="mild" name="pBp" value="1.43"/>
+            <TB.parameter RISK.stage="moderate" name="pBp" value="1.73"/>
+            <TB.parameter RISK.stage="normal" name="pBt" value="1"/>
+            <TB.parameter RISK.stage="over" name="pBt" value="0.82"/>
+            <TB.parameter RISK.stage="mild" name="pBt" value="1.14"/>
+            <TB.parameter RISK.stage="moderate" name="pBt" value="1.58"/>
+            <TB.parameter RISK.stage="normal" name="pBd" value="1"/>
+            <TB.parameter RISK.stage="over" name="pBd" value="0.82"/>
+            <TB.parameter RISK.stage="mild" name="pBd" value="1.14"/>
+            <TB.parameter RISK.stage="moderate" name="pBd" value="1.58"/>
             <transition.matrix>
                 <transition from="I"  to="C"       rate="infclr"/>
                 <transition from="I"  to="Dm"      rate="infmin"/>
                 <transition from="I"  to="Ds"      rate="infsub"/>
-                <transition from="Dm" to="R"       rate="minrec"/>
-                <transition from="Dm" to="Ds"      rate="minsub"/>
+                <transition from="Dm" to="R"       rate="pBp*minrec"/>
+                <transition from="Dm" to="Ds"      rate="pBp*minsub"/>
                 <transition from="Ds" to="Dm"      rate="submin"/>
                 <transition from="Ds" to="Dc"      rate="subclin"/>
                 <transition from="Dc" to="Ds"      rate="clinsub"/>
-                <transition from="Rt" to="Dm"      rate="relmin"/>
-                <transition from="Rt" to="Ds"      rate="relsub"/>
+                <transition from="Rt" to="Dm"      rate="pBp*relmin"/>
+                <transition from="Rt" to="Ds"      rate="pBp*relsub"/>
                 <transition from="Dc" to="TBdead"  rate="muTB"/>
                 <transition from="I"  to="Dmcount" rate="infmin"/>
                 <transition from="I"  to="Dscount" rate="infsub"/>
-                <transition from="Dm" to="Dscount" rate="minsub"/>
+                <transition from="Dm" to="Dscount" rate="pBp*minsub"/>
                 <transition from="Ds" to="Dmcount" rate="submin"/>
                 <transition from="Ds" to="Dccount" rate="subclin"/>
                 <transition from="Dc" to="Dscount" rate="clinsub"/>
-                <transition from="Rt" to="Dmcount" rate="relmin"/>
-                <transition from="Rt" to="Dscount" rate="relsub"/>
+                <transition from="Rt" to="Dmcount" rate="pBp*relmin"/>
+                <transition from="Rt" to="Dscount" rate="pBp*relsub"/>
             </transition.matrix>
         </TB.progression>
         <TB.infectivity>
