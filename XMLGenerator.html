@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Form Generator</title>
+    <style>
+        /* Add your CSS styles here */
+        /* For simplicity, you can style using inline CSS or link an external stylesheet */
+    </style>
+</head>
+<body>
+    <h1>XML Form Generator</h1>
+    <input type="file" id="xsdFileInput">
+    <form id="xmlForm">
+        <!-- Form fields will be generated dynamically -->
+    </form>
+    <button id="generateXML" disabled>Generate XML</button>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            let schemaLoaded = false;
+
+            // Handle file upload
+            $('#xsdFileInput').change(function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const xsdContent = e.target.result;
+                        parseXsd(xsdContent);
+                    };
+                    reader.onerror = function(e) {
+                        alert('Error reading the file.');
+                    };
+                    reader.readAsText(file);
+                }
+            });
+
+            // Parse the uploaded XSD file
+            function parseXsd(xsdContent) {
+                try {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xsdContent, 'text/xml');
+                    const xs = xmlDoc.getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema", "element");
+                    const form = $('#xmlForm');
+                    form.empty(); // Clear existing form fields
+                    for (let i = 0; i < xs.length; i++) {
+                        const elementName = xs[i].getAttribute('name');
+                        const inputType = xs[i].getAttribute('type') || 'text'; // Default to text input if no type is specified
+                        const label = $('<label>').attr('for', elementName).text(elementName + ': ');
+                        const input = $('<input>').attr({ type: inputType, id: elementName, name: elementName });
+                        form.append(label).append(input).append('<br>');
+                    }
+                    schemaLoaded = true;
+                    $('#generateXML').prop('disabled', false);
+                } catch (error) {
+                    alert('Error parsing the XSD file.');
+                }
+            }
+
+            // Generate XML on button click
+            $('#generateXML').click(function() {
+                if (!schemaLoaded) {
+                    alert('Please upload an XSD file first.');
+                    return;
+                }
+                const formData = $('#xmlForm').serializeArray();
+                let xmlData = '<root>';
+                formData.forEach(function(field) {
+                    xmlData += '<' + field.name + '>' + field.value + '</' + field.name + '>';
+                });
+                xmlData += '</root>';
+                downloadXml(xmlData);
+            });
+
+            // Function to download XML
+            function downloadXml(xmlData) {
+                const blob = new Blob([xmlData], { type: 'text/xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'generated.xml';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        });
+    </script>
+</body>
+</html>

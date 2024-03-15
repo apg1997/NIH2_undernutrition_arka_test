@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XSD to XML Converter</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+  <h1>XSD to XML Converter</h1>
+  <input type="file" id="xsdFileInput">
+  <button onclick="convertXSDtoXML()">Convert</button>
+  <hr>
+  <textarea id="xmlOutput" rows="10" cols="80"></textarea>
+
+  <script>
+    function convertXSDtoXML() {
+      var xsdFile = document.getElementById('xsdFileInput').files[0];
+      if (!xsdFile) {
+        alert("Please select an XSD file.");
+        return;
+      }
+
+      var reader = new FileReader();
+      reader.onload = function(event) {
+        var xsdText = event.target.result;
+        var generatedXML = generateXMLFromXSD(xsdText);
+        document.getElementById('xmlOutput').value = generatedXML;
+      };
+      reader.readAsText(xsdFile);
+    }
+
+    function generateXMLFromXSD(xsdText) {
+      // Parse the XSD
+      var parser = new DOMParser();
+      var xsdDoc = parser.parseFromString(xsdText, "text/xml");
+
+      // Start building XML
+      var xmlString = '<?xml version="1.0" encoding="UTF-8"?>\n';
+
+      // Traverse XSD to generate XML
+      var elements = xsdDoc.getElementsByTagName('element');
+      for (var i = 0; i < elements.length; i++) {
+        var element = elements[i];
+        xmlString += generateXMLElement(element);
+      }
+
+      return xmlString;
+    }
+
+    function generateXMLElement(element) {
+      var xmlString = '<' + element.getAttribute('name') + '>';
+
+      // Recursively generate child elements
+      var complexType = element.getElementsByTagName('complexType')[0];
+      if (complexType) {
+        var sequence = complexType.getElementsByTagName('sequence')[0];
+        if (sequence) {
+          var children = sequence.getElementsByTagName('element');
+          for (var i = 0; i < children.length; i++) {
+            xmlString += generateXMLElement(children[i]);
+          }
+        }
+      }
+
+      xmlString += '</' + element.getAttribute('name') + '>\n';
+      return xmlString;
+    }
+  </script>
+</body>
+</html>

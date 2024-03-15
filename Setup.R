@@ -21,7 +21,7 @@ packageVersion("tbmod")
 paths <- set.paths(
   countries = "countries",
   countrycode = "IND",
-  xml = "countries/IND/parameters/test_undernutrition_mixing_2021.xml"
+  xml = "test_undernutrition_mixing_2021.xml"
 )
 
 # Run the 'tbmod' model
@@ -40,7 +40,7 @@ TB_trends_filtered <- TB_trends %>%
 
 # Summarize the filtered data by TB compartment and year
 sum_by_TB <- TB_trends_filtered %>%
-  group_by(TB, year) %>%
+  group_by(TB, year, RISK) %>%
   summarize(total_value = sum(value))
 
 # Create a line plot showing population in each TB compartment over time
@@ -50,30 +50,31 @@ ggplot(sum_by_TB, aes(x = year, y = total_value, color = TB)) +
   geom_line(stat = "identity") +
   labs(x = "Time", y = "Population in Compartment", color = "tbmod compartment") +
   theme_minimal() +
-  scale_y_continuous(limits = c(0,max(sum_by_TB$total_value)))
+  facet_wrap(~RISK)
+scale_y_continuous(limits = c(0, max(sum_by_TB$total_value)))
 
 # Summarize TB values by year
 pops <- TB_trends %>%
-  group_by(year) %>%
+  group_by(year, RISK) %>%
   summarise(population = sum(value))
 
 # Summarize TB prevalence values (Ds and Dc compartments) by year
 sum_tb_values <- TB_trends %>%
   filter(TB %in% c("Ds", "Dc", "Dm")) %>%
-  group_by(year) %>%
+  group_by(year, RISK) %>%
   summarise(prevalence_value = sum(value))
 
 # Merge the population and prevalence data
-sum_tb_values <- merge(pops, sum_tb_values, by.x = "year")
+sum_tb_values <- left_join(sum_tb_values, pops, by = c("year", "RISK"))
 
 # Calculate TB prevalence per 100,000 population
 sum_tb_values$prev_per_100000 <- (sum_tb_values$prevalence_value / sum_tb_values$population) # * 100000
 
 sum_tb_values$year <- as.integer(sum_tb_values$year)
 # Create a line plot showing TB prevalence over time
-ggplot(sum_tb_values, aes(x = year, y = prev_per_100000)) + geom_line() +
+ggplot(sum_tb_values, aes(x = year, y = prev_per_100000, color = RISK)) +
+  geom_line() +
   labs(x = "Time", y = "Prevalence per 100,000") +
-  scale_y_continuous(limits = c(0,max(sum_tb_values$prev_per_100000)))+
-  theme_minimal() +
-  scale_color_viridis_c()
-
+  scale_y_continuous(limits = c(0, max(sum_tb_values$prev_per_100000))) +
+  theme_gray() +
+  facet_wrap(~RISK)
