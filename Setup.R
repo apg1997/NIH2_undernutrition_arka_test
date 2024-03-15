@@ -5,7 +5,7 @@
 # # Install and load the 'tbmod' package
 # install.packages(here("tbmod-rpackage", "tbmod_3.4.8.tar.gz"), repos = NULL, type = "source")
 library(pacman)
-p_load(tbmod)
+p_load(tbmod,tidyverse)
 require(tbmod)
 library(data.table)
 library(ggplot2)
@@ -16,6 +16,8 @@ theme_set(theme_minimal_grid() + panel_border(color = "black"))
 
 # Check the version of the 'tbmod' package
 packageVersion("tbmod")
+
+#library(tidyverse)
 
 # Set paths for input and output files
 paths <- set.paths(
@@ -30,13 +32,9 @@ output <- run(paths, sample.parameters = FALSE, output.flows = FALSE, write.to.f
 # Extract TB trends data from the output
 TB_trends <- output$stocks
 
-# Load necessary libraries for plotting
-library(ggplot2)
-library(dplyr)
-
 # Filter out rows where the values in the "TB" column contain the substring "count"
 TB_trends_filtered <- TB_trends %>%
-  filter(!grepl("count", TB))
+  filter(!str_detect(TB, "count"))
 
 # Summarize the filtered data by TB compartment and year
 sum_by_TB <- TB_trends_filtered %>%
@@ -44,14 +42,11 @@ sum_by_TB <- TB_trends_filtered %>%
   summarize(total_value = sum(value))
 
 # Create a line plot showing population in each TB compartment over time
-library(ggplot2)
-
-ggplot(sum_by_TB, aes(x = year, y = total_value, color = TB)) +
-  geom_line(stat = "identity") +
+ggplot(sum_by_TB, aes(x = year, y = total_value, color = RISK )) +
+  geom_line() +
   labs(x = "Time", y = "Population in Compartment", color = "tbmod compartment") +
-  theme_minimal() +
-  facet_wrap(~RISK)
-scale_y_continuous(limits = c(0, max(sum_by_TB$total_value)))
+  # theme_minimal() +
+  facet_wrap(~TB, scales = "free_y")
 
 # Summarize TB values by year
 pops <- TB_trends %>%
@@ -68,12 +63,53 @@ sum_tb_values <- TB_trends %>%
 sum_tb_values <- left_join(sum_tb_values, pops, by = c("year", "RISK"))
 
 # Calculate TB prevalence per 100,000 population
-sum_tb_values$prev_per_100000 <- (sum_tb_values$prevalence_value / sum_tb_values$population) # * 100000
+sum_tb_values <- sum_tb_values %>%
+  mutate(prev_per_100000 = (prevalence_value/ population) * 100000)
 
-sum_tb_values$year <- as.integer(sum_tb_values$year)
 # Create a line plot showing TB prevalence over time
 ggplot(sum_tb_values, aes(x = year, y = prev_per_100000, color = RISK)) +
   geom_line() +
   labs(x = "Time", y = "Prevalence per 100,000") +
-  scale_y_continuous(limits = c(0, max(sum_tb_values$prev_per_100000))) +
-  theme_gray() 
+  # theme_gray() +
+  scale_y_continuous(limits = c(0, max(sum_tb_values$prev_per_100000)))
+
+# Create a line plot showing  Population over time
+ggplot(sum_tb_values, aes(x = year, y = population, color = RISK)) +
+  geom_line() +
+  labs(x = "Time", y = "Population") +
+  # theme_gray() +
+  scale_y_continuous(limits = c(0, max(sum_tb_values$population)))
+
+
+str(sum_tb_values)
+
+
+library(dplyr)
+
+# Group by year
+grouped_df <- group_by(sum_tb_values, year)
+
+# Calculate RR for each year
+RR_by_year <- summarise(grouped_df,
+                        RR_mild = mean(prev_per_100000[RISK == "mild"]) / mean(prev_per_100000[RISK == "normal"]),
+                        RR_moderate = mean(prev_per_100000[RISK == "moderate"]) / mean(prev_per_100000[RISK == "normal"]),
+                        RR_over = mean(prev_per_100000[RISK == "over"]) / mean(prev_per_100000[RISK == "normal"])
+)
+
+# Print the results
+print(RR_by_year)
+
+library(ggplot2)
+
+# Assuming RR_by_year is already calculated as per the previous code
+
+# Reshape data from wide to long format
+RR_long <- tidyr::pivot_longer(RR_by_year, cols = starts_with("RR"), names_to = "Risk_Level", values_to = "Relative_Risk")
+
+# Plot
+ggplot(RR_long, aes(x = year, y = Relative_Risk, color = Risk_Level)) +
+  geom_line() +
+  labs(title = "Relative Risk of Tuberculosis by Year",
+       x = "Year",
+       y = "Relative Risk") 
+  # theme_minimal()
