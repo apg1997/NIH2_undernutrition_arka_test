@@ -105,7 +105,7 @@ ggplot(sum_tb_values, aes(x = year, y = prev_per_100000)) +
   geom_line() +
   labs(x = "Time", y = "Prevalence per 100,000") +
   theme_gray() +
-  scale_y_continuous(limits = c(0, max(sugem_tb_values$prev_per_100000))) +
+  scale_y_continuous(limits = c(0, max(sum_tb_values$prev_per_100000))) +
   facet_wrap(~RISK, scales = "free_y")
 ```
 
@@ -136,9 +136,91 @@ RR_long <- tidyr::pivot_longer(RR_by_year, cols = starts_with("RR"), names_to = 
 # Plot
 ggplot(RR_long, aes(x = year, y = Relative_Risk, color = Risk_Level)) +
   geom_line() +
-  labs(title = "Relative Risk of Tuberculosis by Year",
+  labs(title = "Relative Risk of Infectious Tuberculosis by Year",
        x = "Year",
        y = "Relative Risk") 
   # theme_minimal()
 
 ```
+
+```{r}
+
+sum_tb_values_CNR <- TB_trends %>%
+  filter(TB %in% c("Rt")) %>%
+  group_by(year,RISK) %>%
+  summarise(prevalence_value = sum(value))
+
+
+```
+
+```{r}
+sum_tb_values_CNR <- left_join(sum_tb_values_CNR, pops, by = c("year","RISK"))
+```
+
+```{r}
+sum_tb_values_CNR <- sum_tb_values_CNR %>%
+  mutate(prev_per_100000 = (prevalence_value / population) * 100000)
+```
+
+```{r}
+ggplot(sum_tb_values_CNR, aes(x = year, y = prev_per_100000)) +
+  geom_line() +
+  labs(x = "Time", y = "Case Notification Rate per 100,000") +
+  theme_gray() +
+  scale_y_continuous(limits = c(0, max(sum_tb_values_CNR$prev_per_100000))) +
+  facet_wrap(~RISK, scales = "free_y")
+```
+
+í
+
+```{r}
+
+sum_tb_values_burden <- TB_trends %>%
+  filter(TB %in% c("Ds","Dc","Dm")) %>%
+  group_by(year,RISK,TB) %>%
+  summarise(prevalence_value = sum(value))
+
+
+```
+
+```{r}
+sum_tb_values_burden <- left_join(sum_tb_values_burden, pops, by = c("year","RISK"))
+```
+
+```{r}
+sum_tb_values_burden <- sum_tb_values_burden %>%
+  mutate(prev_per_100000 = (prevalence_value / population) * 100000)
+
+sum_tb_values_burden$year <-  as.integer(sum_tb_values_burden$year)
+```
+
+```{r}
+p1 <- ggplot(sum_tb_values_burden, aes(x = year, y = prev_per_100000, color = TB)) +
+  geom_line() +
+  labs(x = "Time", y = "Case Notification Rate per 100,000") +
+  theme_gray() +
+  scale_y_continuous(limits = c(0, max(sum_tb_values_burden$prev_per_100000))) +
+  facet_wrap(~RISK, scales = "free_y")
+p1
+```
+
+```{r}
+datafrom_plot <- ggplot_build(p1)$data
+```
+
+```{r}
+filtered_data <- sum_tb_values_burden[sum_tb_values_burden$year == 2024, ]
+str(filtered_data)
+```
+
+```{r}
+ratio_df <- filtered_data %>%
+  group_by(RISK) %>%
+  summarize(Ds_Dc_ratio = prevalence_value[TB == "Ds"] / prevalence_value[TB == "Dc"],
+            Dm_Dc_ratio = prevalence_value[TB == "Dm"] / prevalence_value[TB == "Dc"])
+
+clipr::write_clip(ratio_df)
+ratio_df
+```
+
+\
