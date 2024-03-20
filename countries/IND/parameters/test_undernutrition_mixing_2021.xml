@@ -4,7 +4,7 @@
         <options>
       <numerical.integration method="ode45" atol="0" rtol="1e-7" min.value.for.state.var="-0.1"/>
         </options>
-        <demography country.code="ignore" rescale.population="1950">
+        <demography country.code="IND" rescale.population="1950">
             <from.data>
                 <population file ="data/demographics.csv" />
                 <birthrate from.population.data="true" />
@@ -38,6 +38,20 @@
       <stage name="mild" fraction.at.birth="0.17"/>
       <stage name="moderate" fraction.at.birth="0.162"/>
     </RISK.stages>
+    <RISK.incidence>
+        <incidence.data file="data/Undernutrition/BMI-mild-over_s1.txt" times="1980,2015" values="1,1" proportions="false" denominator="susc" once.per.year="true" target.prevalence="true"/>
+        <incidence.data file="data/Undernutrition/BMI-mild-moderate_s1.txt" times="1980,2015" values="1,1" proportions="false" denominator="susc" once.per.year="true" target.prevalence="true"/>
+        <incidence.data file="data/Undernutrition/BMI-mild-normal_s1.txt" times="1980,2015" values="1,1" proportions="false" denominator="susc" once.per.year="true" target.prevalence="true"/>
+        <incidence.data file="data/Undernutrition/BMI-over-mild_s1.txt" times="1980,2015" values="1,1" proportions="false" denominator="susc" once.per.year="true" target.prevalence="true"/>
+        <incidence.data file="data/Undernutrition/BMI-over-moderate_s1.txt" times="1980,2015" values="1,1" proportions="false" denominator="susc" once.per.year="true" target.prevalence="true"/>
+        <incidence.data file="data/Undernutrition/BMI-over-normal_s1.txt" times="1980,2015" values="1,1" proportions="false" denominator="susc" once.per.year="true" target.prevalence="true"/>
+        <incidence.data file="data/Undernutrition/BMI-moderate-mild_s1.txt" times="1980,2015" values="1,1" proportions="false" denominator="susc" once.per.year="true" target.prevalence="true"/>
+        <incidence.data file="data/Undernutrition/BMI-moderate-over_s1.txt" times="1980,2015" values="1,1" proportions="false" denominator="susc" once.per.year="true" target.prevalence="true"/>
+        <incidence.data file="data/Undernutrition/BMI-moderate-normal_s1.txt" times="1980,2015" values="1,1" proportions="false" denominator="susc" once.per.year="true" target.prevalence="true"/>
+        <incidence.data file="data/Undernutrition/BMI-normal-mild_s1.txt" times="1980,2015" values="1,1" proportions="false" denominator="susc" once.per.year="true" target.prevalence="true"/>
+        <incidence.data file="data/Undernutrition/BMI-normal-over_s1.txt" times="1980,2015" values="1,1" proportions="false" denominator="susc" once.per.year="true" target.prevalence="true"/>
+        <incidence.data file="data/Undernutrition/BMI-normal-moderate_s1.txt" times="1980,2015" values="1,1" proportions="false" denominator="susc" once.per.year="true" target.prevalence="true"/>
+      </RISK.incidence>
   </RISK>
     <HIV>
         <HIV.stages>
